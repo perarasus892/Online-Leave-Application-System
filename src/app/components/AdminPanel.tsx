@@ -124,7 +124,7 @@ export function AdminPanel() {
                     <div>
                         <CardTitle className="flex items-center gap-2">
                             <Users className="w-5 h-5 text-indigo-600" />
-                            Student & Faculty Management
+                            Leave Management
                         </CardTitle>
                         <CardDescription className="mt-1">
                             Add, view, and manage college students and staff
@@ -139,7 +139,7 @@ export function AdminPanel() {
                         </DialogTrigger>
                         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
-                                <DialogTitle>Add New Student / Staff</DialogTitle>
+                                <DialogTitle>Add New User / Staff</DialogTitle>
                                 <DialogDescription>
                                     Create a new account. They can login immediately.
                                 </DialogDescription>

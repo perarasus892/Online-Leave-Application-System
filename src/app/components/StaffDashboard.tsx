@@ -201,7 +201,7 @@ export function StaffDashboard() {
           return;
         }
 
-        toast.success(reviewAction === "Approved" ? "Student leave verified!" : "Student leave rejected");
+        toast.success(reviewAction === "Approved" ? "Leave verified!" : "Leave rejected");
         // Refresh data only for real leaves
         fetchData();
       }
@@ -342,7 +342,7 @@ export function StaffDashboard() {
                 <Users className="w-6 h-6" />
               </div>
               <div>
-                <CardTitle className="text-2xl">Student Leave Verification</CardTitle>
+                <CardTitle className="text-2xl">Leave Verification</CardTitle>
                 <CardDescription className="text-slate-300">
                   Verify and mentor students in the **{user?.department}** department.
                 </CardDescription>

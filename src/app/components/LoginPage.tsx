@@ -91,7 +91,7 @@ export function LoginPage() {
               </h1>
             </div>
             <p className="text-xl text-gray-600 uppercase tracking-wide font-medium">
-              STUDENT LEAVE APPLICATION AND TRACKING
+              LEAVE APPLICATION AND TRACKING
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export function LoginPage() {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <Users className="w-10 h-10 text-indigo-600 mb-3" />
               <h3 className="font-semibold text-gray-900 mb-1">Role-based</h3>
-              <p className="text-sm text-gray-600">Student & HOD views</p>
+              <p className="text-sm text-gray-600">Role-based views</p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <Building2 className="w-10 h-10 text-indigo-600 mb-3" />

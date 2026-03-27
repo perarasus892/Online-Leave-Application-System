@@ -60,6 +60,18 @@ interface Leave {
   comments: string | null;
 }
 
+const DEMO_USERS_BY_COURSE: Record<string, {name: string, email: string, userId: string}> = {
+  "BSc Computer Science": { name: "Rajesh Kumar", email: "stu-cs-01@dgvaishnav.edu.in", userId: "STU-CS-01" },
+  "BCA": { name: "Priya Sharma", email: "stu-bca-01@dgvaishnav.edu.in", userId: "STU-BCA-01" },
+  "BCom": { name: "Arun Vijay", email: "stu-bcom-01@dgvaishnav.edu.in", userId: "STU-BCOM-01" },
+  "BA Economics": { name: "Karthik R", email: "stu-eco-01@dgvaishnav.edu.in", userId: "STU-ECO-01" },
+  "BSc Mathematics": { name: "Anjali Menon", email: "stu-math-01@dgvaishnav.edu.in", userId: "STU-MATH-01" },
+  "BSc Physics": { name: "Vikram Singh", email: "stu-phy-01@dgvaishnav.edu.in", userId: "STU-PHY-01" },
+  "MCA": { name: "Deepa N", email: "stu-mca-01@dgvaishnav.edu.in", userId: "STU-MCA-01" },
+  "MBA": { name: "Rahul Dravid", email: "stu-mba-01@dgvaishnav.edu.in", userId: "STU-MBA-01" },
+  "MSc IT": { name: "Suresh K", email: "stu-mscit-01@dgvaishnav.edu.in", userId: "STU-MSCIT-01" },
+};
+
 export function EmployeeDashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
@@ -80,11 +92,13 @@ export function EmployeeDashboard() {
 
   // Reactively calculate statistics based on the leave list
   const statistics = useMemo(() => {
+    const approved = leaves.filter(l => l.status === "Approved");
+    const rejected = leaves.filter(l => l.status === "Rejected");
     return {
-      total: leaves.length,
+      total: approved.length + rejected.length,
       pending: leaves.filter(l => l.status === "Pending" || l.status === "Verified").length,
-      approved: leaves.filter(l => l.status === "Approved").length,
-      rejected: leaves.filter(l => l.status === "Rejected").length,
+      approved: approved.length,
+      rejected: rejected.length,
     };
   }, [leaves]);
 
@@ -109,11 +123,23 @@ export function EmployeeDashboard() {
     }
 
     const parsedUser = JSON.parse(userData);
-    setUser(parsedUser);
 
     // Get selected course from localStorage
     const course = localStorage.getItem("selectedCourse");
     setSelectedCourse(course);
+
+    if (course && DEMO_USERS_BY_COURSE[course]) {
+      const demoUser = DEMO_USERS_BY_COURSE[course];
+      setUser({
+        ...parsedUser,
+        name: demoUser.name,
+        email: demoUser.email,
+        userId: demoUser.userId,
+        department: course
+      });
+    } else {
+      setUser(parsedUser);
+    }
 
     // Redirect if not student
     if (parsedUser.role !== "Student") {
@@ -141,9 +167,12 @@ export function EmployeeDashboard() {
       // Fetch leave history
       const leavesResult = await mockApi.getMyLeaves(token);
       if (leavesResult.success && leavesResult.leaves) {
-        const demoLeaves = [
+        const demoLeaves: any[] = [
           {
             leaveId: "DEMO-001",
+            userId: "STU-DEMO",
+            userName: "Demo Student",
+            department: "Computer Science",
             leaveType: "Casual Leave",
             startDate: new Date(Date.now() - 604800000).toISOString(),
             endDate: new Date(Date.now() - 518400000).toISOString(),
@@ -153,10 +182,16 @@ export function EmployeeDashboard() {
             appliedOn: new Date(Date.now() - 864000000).toISOString(),
             approvedBy: "HOD-CS",
             approvedOn: new Date(Date.now() - 518400000).toISOString(),
+            verifiedBy: null,
+            verifiedOn: null,
+            verifiedComments: null,
             comments: "Approved for demo purposes"
           },
           {
             leaveId: "DEMO-002",
+            userId: "STU-DEMO",
+            userName: "Demo Student",
+            department: "Computer Science",
             leaveType: "Sick Leave",
             startDate: new Date(Date.now() - 172800000).toISOString(),
             endDate: new Date(Date.now() - 86400000).toISOString(),
@@ -165,10 +200,17 @@ export function EmployeeDashboard() {
             status: "Verified",
             appliedOn: new Date(Date.now() - 259200000).toISOString(),
             verifiedBy: "STAFF-CS",
+            verifiedOn: new Date(Date.now() - 259200000).toISOString(),
             verifiedComments: "Get well soon!",
+            approvedBy: null,
+            approvedOn: null,
+            comments: null,
           },
           {
             leaveId: "DEMO-003",
+            userId: "STU-DEMO",
+            userName: "Demo Student",
+            department: "Computer Science",
             leaveType: "Casual Leave",
             startDate: new Date(Date.now() - 1209600000).toISOString(),
             endDate: new Date(Date.now() - 1123200000).toISOString(),
@@ -178,10 +220,16 @@ export function EmployeeDashboard() {
             appliedOn: new Date(Date.now() - 1500000000).toISOString(),
             approvedBy: "HOD-CS",
             approvedOn: new Date(Date.now() - 1100000000).toISOString(),
+            verifiedBy: null,
+            verifiedOn: null,
+            verifiedComments: null,
             comments: "Enjoy your family event."
           },
           {
             leaveId: "DEMO-004",
+            userId: "STU-DEMO",
+            userName: "Demo Student",
+            department: "Computer Science",
             leaveType: "Sick Leave",
             startDate: new Date(Date.now() - 259200000).toISOString(),
             endDate: new Date(Date.now() - 172800000).toISOString(),
@@ -191,10 +239,33 @@ export function EmployeeDashboard() {
             appliedOn: new Date(Date.now() - 345600000).toISOString(),
             approvedBy: "STAFF-CS",
             approvedOn: new Date(Date.now() - 172800000).toISOString(),
+            verifiedBy: null,
+            verifiedOn: null,
+            verifiedComments: null,
             comments: "Please provide a medical certificate for frequent sick leaves."
           }
         ];
-        setLeaves([...leavesResult.leaves, ...demoLeaves]);
+
+        const course = localStorage.getItem("selectedCourse");
+        let finalDemoLeaves = [...demoLeaves];
+        if (course) {
+            const code = course.substring(0, 3).toUpperCase();
+            finalDemoLeaves = finalDemoLeaves.map(leave => ({
+                ...leave,
+                leaveId: leave.leaveId.replace("00", code),
+                approvedBy: leave.approvedBy ? `HOD-${code}` : null,
+                verifiedBy: leave.verifiedBy ? `STAFF-${code}` : null,
+            }));
+            
+            if (course.length % 2 === 0) {
+               finalDemoLeaves.pop();
+            }
+            if (course.length % 3 === 0) {
+               finalDemoLeaves.shift();
+            }
+        }
+
+        setLeaves([...leavesResult.leaves, ...finalDemoLeaves]);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -320,7 +391,7 @@ export function EmployeeDashboard() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">DG VAISHNAV COLLEGE</h1>
-                <p className="text-sm text-gray-500">Student Portal</p>
+                <p className="text-sm text-gray-500">Portal</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -338,7 +409,7 @@ export function EmployeeDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card 
             className="bg-white border-slate-200 shadow-sm border cursor-pointer hover:bg-slate-50 transition-colors"
             onClick={() => setActiveTab("all")}
@@ -356,22 +427,6 @@ export function EmployeeDashboard() {
             </CardContent>
           </Card>
 
-          <Card 
-            className="bg-white border-slate-200 shadow-sm border cursor-pointer hover:bg-slate-50 transition-colors"
-            onClick={() => setActiveTab("pending")}
-          >
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-500 text-sm font-medium">Pending</p>
-                  <p className="text-3xl font-bold mt-1 text-amber-600">{statistics.pending}</p>
-                </div>
-                <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-amber-500" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           <Card 
             className="bg-white border-slate-200 shadow-sm border cursor-pointer hover:bg-slate-50 transition-colors"
@@ -615,12 +670,6 @@ export function EmployeeDashboard() {
                         All Applications
                       </TabsTrigger>
                       <TabsTrigger 
-                        value="pending" 
-                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent px-0 pb-3"
-                      >
-                        Pending
-                      </TabsTrigger>
-                      <TabsTrigger 
                         value="approved" 
                         className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent px-0 pb-3"
                       >
@@ -637,12 +686,12 @@ export function EmployeeDashboard() {
                   
                   <div className="divide-y overflow-auto max-h-[600px]">
                     <TabsContent value="all" className="mt-0">
-                      {leaves.length === 0 ? (
+                      {leaves.filter(l => l.status === "Approved" || l.status === "Rejected").length === 0 ? (
                         <div className="p-12 text-center">
                           <p className="text-slate-500">No leave applications found.</p>
                         </div>
                       ) : (
-                        leaves.map((leave) => (
+                        leaves.filter(l => l.status === "Approved" || l.status === "Rejected").map((leave) => (
                           <div
                             key={leave.leaveId}
                             className="border-b last:border-b-0 p-4 hover:bg-slate-50 transition-shadow"
@@ -710,25 +759,6 @@ export function EmployeeDashboard() {
                       )}
                     </TabsContent>
 
-                    <TabsContent value="pending" className="mt-0">
-                      <div className="divide-y">
-                        {leaves.filter(l => l.status === "Pending" || l.status === "Verified").length === 0 ? (
-                          <div className="p-12 text-center text-slate-500">No pending leave applications.</div>
-                        ) : (
-                          leaves.filter(l => l.status === "Pending" || l.status === "Verified").map((leave) => (
-                            <div key={leave.leaveId} className="p-6 hover:bg-slate-50 transition-colors">
-                              <div className="flex justify-between items-start mb-2">
-                                <div>
-                                  <h4 className="font-bold text-slate-900">{leave.leaveType}</h4>
-                                  <p className="text-sm text-slate-500">{new Date(leave.startDate).toLocaleDateString()} - {new Date(leave.endDate).toLocaleDateString()}</p>
-                                </div>
-                                <Badge className={getStatusColor(leave.status)} variant="outline">{leave.status}</Badge>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </TabsContent>
 
                     <TabsContent value="approved" className="mt-0">
                       <div className="divide-y">
